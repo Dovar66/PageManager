@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.gdtv.third.autolayout.AutoLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_empty"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    >
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <ImageView
+        android:id="@+id/iv_state"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="340px"
+        android:layout_height="340px"
+        android:src="@mipmap/icon_empty_network_fault"/>
+
+    <com.gdtv.third.autolayout.AutoLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#8e8e8e"
+            android:textSize="@dimen/text_32px"
+            android:text="服务器正在开小差，喝杯咖啡再来吧"/>
+
+        <TextView
+            android:id="@+id/tv_jump"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="30px"
+            android:textColor="#40b8ff"
+            android:textSize="32px"
+            android:text="随便逛逛"/>
+    </com.gdtv.third.autolayout.AutoLinearLayout>
+
+</com.gdtv.third.autolayout.AutoLinearLayout>
