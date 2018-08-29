@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#8e8e8e"
-            android:textSize="@dimen/text_32px"
+            android:textSize="32px"
             android:gravity="center"
             android:text="页面加载失败，点击重试"/>
 

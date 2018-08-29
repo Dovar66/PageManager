@@ -25,10 +25,6 @@ public abstract class PageListener {
 
     }
 
-    public void setUnLoginEvent(View unLoginView) {
-
-    }
-
     public void setNoNetworkEvent(View noNetworkView) {
 
     }

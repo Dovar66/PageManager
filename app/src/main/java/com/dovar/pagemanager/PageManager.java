@@ -1,13 +1,6 @@
 package com.dovar.pagemanager;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +18,6 @@ public class PageManager {
     private static int BASE_EMPTY_LAYOUT = R.layout.pager_empty;//没有内容
     private static int BASE_NONETWORK_LAYOUT = R.layout.pager_no_network;//没有网络，请检查网络后重试
     private static int BASE_OUTDATE_LAYOUT = R.layout.pager_outdate;//资源已下架
-    private static int BASE_UNLOGIN_LAYOUT = R.layout.pager_unlogin;//未登录，点击跳转到登录
 
     private PageLayout mPageLayout;
     private boolean isLoading;//加载中
@@ -54,14 +46,10 @@ public class PageManager {
         if (layoutIdOfOutdate > 0) {
             BASE_OUTDATE_LAYOUT = layoutIdOfOutdate;
         }
-        if (layoutIdOfUnLogin > 0) {
-            BASE_UNLOGIN_LAYOUT = layoutIdOfUnLogin;
-        }
-
     }
 
     /**
-     * 必须为activity或者view.如果是view,则该view对象必须有parent
+     * 必须为activity或者view.如果是view,则该view对象必须有parent(Fragment的mainView没有parent)
      *
      * @return 当前页面的状态管理器
      */
@@ -69,16 +57,12 @@ public class PageManager {
         return new PageManager(mActivity, mListener);
     }
 
-    /**
-     * 直接传入fragment时依然存在问题，暂不采用此方法，可使用下面传View的init()方法
-     */
-//    public static PageManager init(final Fragment mFragment, PageListener mListener) {
-//        return new PageManager(mFragment, mListener);
-//    }
+    //此方法初始化时默认展示loadingView，而不是contentView
     public static PageManager init(final View mView, PageListener mListener) {
         return new PageManager(mView, mListener, true);
     }
 
+    //初始化并设置默认展示loadingView还是contentView
     public static PageManager init(final View mView, PageListener mListener, boolean showLoadingByDefault) {
         return new PageManager(mView, mListener, showLoadingByDefault);
     }
@@ -193,7 +177,6 @@ public class PageManager {
         mPageLayout.showEmpty();
     }
 
-
     public void showOutdate() {
         if (mPageLayout == null) return;
 
@@ -228,15 +211,6 @@ public class PageManager {
         mPageLayout.showNoNetwork();
     }
 
-    public void showUnLogin() {
-        if (mPageLayout == null) return;
-
-        isLoading = false;
-        isOutdating = false;
-
-        mPageLayout.showUnLogin();
-    }
-
     public PageManager(Activity mActivity, PageListener mPageListener) {
         ViewGroup contentParent = (ViewGroup) mActivity.findViewById(android.R.id.content);
         if (contentParent == null) {
@@ -244,19 +218,6 @@ public class PageManager {
             return;
         }
         setupPageManager(contentParent, 0, mPageListener, true);
-    }
-
-    public PageManager(Fragment mFragment, PageListener mPageListener) {
-        if (mFragment.getView() != null) {
-            ViewGroup contentParent = (ViewGroup) (mFragment.getView().getParent());
-            if (contentParent == null) {
-                Log.d("pageManager", "contentParent==null");
-                return;
-            }
-            setupPageManager(contentParent, 0, mPageListener, true);
-        } else {
-            Log.d("pageManager", "fragment has no contentView");
-        }
     }
 
     public PageManager(View container, PageListener mPageListener, boolean showLoadingByDefault) {
@@ -300,16 +261,14 @@ public class PageManager {
         mPageLayout.setEmptyView(BASE_EMPTY_LAYOUT);
         mPageLayout.setOutdateView(BASE_OUTDATE_LAYOUT);
         mPageLayout.setNoNetworkView(BASE_NONETWORK_LAYOUT);
-        mPageLayout.setUnLoginView(BASE_UNLOGIN_LAYOUT);
 
         //callback
         if (mPageListener != null) {
-            mPageListener.setServerErrorEvent(mPageLayout.getServerErrorView());
             mPageListener.setLoadingEvent(mPageLayout.getLoadingView());
+            mPageListener.setServerErrorEvent(mPageLayout.getServerErrorView());
             mPageListener.setEmptyEvent(mPageLayout.getEmptyView());
             mPageListener.setOutdateEvent(mPageLayout.getOutdateView());
             mPageListener.setNoNetworkEvent(mPageLayout.getNoNetworkView());
-            mPageListener.setUnLoginEvent(mPageLayout.getUnLoginView());
         }
 
         if (showLoadingByDefault) {
@@ -325,66 +284,6 @@ public class PageManager {
 
     public boolean isOutdating() {
         return isOutdating;
-    }
-
-    private static boolean isNetWorkAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager == null) {
-            return false;
-        } else {
-            NetworkInfo info = connectivityManager.getActiveNetworkInfo();
-            if (info == null) {
-                return false;
-            } else {
-                if (info.isAvailable()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 当判断当前手机没有网络时选择是否打开网络设置
-     */
-    private static AlertDialog showNoNetWorkDlg(final Object container) {
-        AlertDialog dialog = null;
-        Context context = null;
-
-        if (container instanceof Activity) {
-            context = (Activity) container;
-
-        } else if (container instanceof Fragment) {
-            context = ((Fragment) container).getActivity();
-
-        } else if (container instanceof View) {
-            context = ((View) container).getContext();
-        }
-
-        try {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            final Activity finalActivity = (Activity) context;
-
-            dialog = builder        //
-                    .setTitle("提示")            //
-                    .setMessage("当前无网络").setPositiveButton("去设置", new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // 跳转到系统的网络设置界面
-                            //intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
-                            Intent intent = new Intent(android.provider.Settings.ACTION_SETTINGS);
-
-                            finalActivity.startActivity(intent);
-                            dialog.dismiss();
-                        }
-                    }).setNegativeButton("知道了", null).show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return dialog;
     }
 
 }

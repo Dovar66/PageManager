@@ -18,7 +18,6 @@ public class PageLayout extends FrameLayout {
     private View mServerErrorView;
     private View mEmptyView;
     private View mOutdateView;
-    private View mUnloginView;
     private View mNoNetworkView;
     private LayoutInflater mInflater;
 
@@ -74,19 +73,6 @@ public class PageLayout extends FrameLayout {
                 @Override
                 public void run() {
                     showView(mOutdateView);
-                }
-            });
-        }
-    }
-
-    public void showUnLogin() {
-        if (isMainThread()) {
-            showView(mUnloginView);
-        } else {
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    showView(mUnloginView);
                 }
             });
         }
@@ -150,7 +136,6 @@ public class PageLayout extends FrameLayout {
         showTargetIfSame(view, mEmptyView);
         showTargetIfSame(view, mNoNetworkView);
         showTargetIfSame(view, mOutdateView);
-        showTargetIfSame(view, mUnloginView);
     }
 
     public View setLoadingView(int layoutId) {
@@ -201,18 +186,6 @@ public class PageLayout extends FrameLayout {
         return newView;
     }
 
-    public View setUnLoginView(int layoutId) {
-        View newView = mInflater.inflate(layoutId, this, false);
-        if (newView != null) {
-            if (mUnloginView != null) {
-                removeView(mUnloginView);
-            }
-            addView(newView);
-            mUnloginView = newView;
-        }
-        return newView;
-    }
-
     public View setNoNetworkView(int layoutId) {
         View newView = mInflater.inflate(layoutId, this, false);
         if (newView != null) {
@@ -258,10 +231,6 @@ public class PageLayout extends FrameLayout {
 
     public View getOutdateView() {
         return mOutdateView;
-    }
-
-    public View getUnLoginView() {
-        return mUnloginView;
     }
 
     public View getNoNetworkView() {

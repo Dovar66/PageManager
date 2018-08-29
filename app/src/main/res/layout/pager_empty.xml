@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:text="没有任何内容"
             android:textColor="#8e8e8e"
-            android:textSize="@dimen/text_32px"/>
+            android:textSize="32px"/>
 
         <TextView
             android:id="@+id/tv_jump"
